@@ -66,6 +66,7 @@ func NewGame() (*Game, error) {
 	for i := 0; i < 4; i++ {
 		g.onceLayer[i] = ebiten.NewImage(5*Size, (4-i)*Size)
 	}
+	g.InitLayers()
 	return g, nil
 }
 
@@ -85,9 +86,6 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	op.GeoM.Translate(0, Size)
 	for i := 3; i >= 0; i-- {
 		layerStr := fmt.Sprintf("%d層", i+1)
-		g.drawTxt(g.onceLayer[i], g.onceText+layerStr, 0, 0)
-		g.drawImg(g.onceLayer[i], g.onceImage, 0, Size/3)
-		g.drawVec(g.onceLayer[i], Size*2/3, Size/3)
 		g.drawTxt(g.updateLayer[i], g.updateText+layerStr, 0, 0)
 		g.drawImg(g.updateLayer[i], g.updateImage, 0, Size/3)
 		g.drawVec(g.updateLayer[i], Size*2/3, Size/3)
@@ -100,8 +98,22 @@ func (g *Game) Draw(screen *ebiten.Image) {
 			screen.DrawImage(g.updateLayer[i], upOp)
 			break
 		}
-		g.onceLayer[i-1].DrawImage(g.onceLayer[i], op)
 		g.updateLayer[i-1].DrawImage(g.updateLayer[i], op)
+	}
+}
+
+func (g *Game) InitLayers() {
+	op := &ebiten.DrawImageOptions{}
+	op.GeoM.Translate(0, Size)
+	for i := 3; i >= 0; i-- {
+		layerStr := fmt.Sprintf("%d層", i+1)
+		g.drawTxt(g.onceLayer[i], g.onceText+layerStr, 0, 0)
+		g.drawImg(g.onceLayer[i], g.onceImage, 0, Size/3)
+		g.drawVec(g.onceLayer[i], Size*2/3, Size/3)
+		if i == 0 {
+			break
+		}
+		g.onceLayer[i-1].DrawImage(g.onceLayer[i], op)
 	}
 }
 
